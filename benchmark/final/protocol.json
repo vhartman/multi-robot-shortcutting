@@ -1,0 +1,252 @@
+{
+  "schema": "mr-shortcut-final-protocol-v1",
+  "status": "frozen-no-results",
+  "frozen_on": "2026-09-30",
+  "purpose": "Final offline and planning-in-the-loop comparison for the multi-robot shortcutting article.",
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "design": {
+    "path_indices": [
+      0,
+      1,
+      2
+    ],
+    "shortcut_seeds": [
+      0,
+      1,
+      2
+    ],
+    "cross_product": true,
+    "execution": "strictly_serial",
+    "aggregation": {
+      "within_path": "pointwise_median_over_shortcut_seeds",
+      "across_paths": "pointwise_median_over_initial_paths",
+      "uncertainty": "minimum_to_maximum_across_path_medians",
+      "weighting": "each_initial_path_has_equal_weight"
+    }
+  },
+  "rng": {
+    "pythonhashseed": 0,
+    "environment_seed_source": "benchmark/manifest.json",
+    "planner_seed_rule": "environment_seed + path_index",
+    "shortcut_seed_rule": "shortcut_seeds entry",
+    "online_call_seed_rule": "shortcut_seed + 104729 * shortcut_call_index",
+    "online_shortcut_rng_isolated_from_planner": true
+  },
+  "methods": [
+    {
+      "id": "single_robot_mode",
+      "label": "random robot + compatible run",
+      "offline_policy": "single_robot_mode",
+      "online_policy": "single_robot_mode"
+    },
+    {
+      "id": "robot_subset_mode",
+      "label": "random robot subset + compatible run",
+      "offline_policy": "robot_subset_mode",
+      "online_policy": "robot_subset_mode"
+    },
+    {
+      "id": "huang_round_robin_no_prioritized",
+      "label": "Huang round robin, no priority",
+      "offline_policy": "huang_round_robin_no_prioritized",
+      "online_policy": "huang_round_robin_no_prioritized"
+    },
+    {
+      "id": "tree_gain",
+      "label": "tree + gain (standard)",
+      "offline_policy": "tree_prefix",
+      "online_policy": "upstream_tree"
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain",
+      "offline_policy": "tree_group_gain",
+      "online_policy": "tree_group_gain"
+    },
+    {
+      "id": "gain_only",
+      "label": "gain only",
+      "offline_policy": "gain_only",
+      "online_policy": "gain_only"
+    },
+    {
+      "id": "full_tree_gain_round_robin",
+      "label": "full/tree/gain round robin",
+      "offline_policy": "full_tree_gain_round_robin",
+      "online_policy": "full_tree_gain_round_robin"
+    }
+  ],
+  "offline": {
+    "interpolation_resolution": 0.5,
+    "budget_type": "shortcut_wall_clock_seconds",
+    "timer_excludes": [
+      "environment_construction",
+      "input_restoration_and_certificate",
+      "final_certificate"
+    ]
+  },
+  "online": {
+    "planner": "BidirectionalRRTstar",
+    "optimize": true,
+    "shortcut_checks_per_call": 250,
+    "planner_default_shortcut_checks_per_call": 100,
+    "refinement_seconds_after_first_solution": 100,
+    "replay_margin_seconds": 15,
+    "runtime_rule": "ceil(saved_first_solution_wall_seconds) + refinement_seconds_after_first_solution + replay_margin_seconds",
+    "analysis_time_origin": "first_solution",
+    "analysis_horizon_seconds": 100,
+    "include_planner_only_control": true,
+    "planner_only_repetitions": "once_per_initial_path",
+    "no_uncharged_final_shortcut_pass": true
+  },
+  "cases": [
+    {
+      "id": "rai-random-2d",
+      "input_generation_seconds": 500,
+      "offline_seconds": 20,
+      "online": true
+    },
+    {
+      "id": "rai-2d-handover",
+      "input_generation_seconds": 500,
+      "offline_seconds": 10,
+      "online": true
+    },
+    {
+      "id": "rai-bottles",
+      "input_generation_seconds": 500,
+      "offline_seconds": 20,
+      "online": true
+    },
+    {
+      "id": "rai-box-rearrangement",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-box-reorientation",
+      "input_generation_seconds": 500,
+      "offline_seconds": 20,
+      "online": true
+    },
+    {
+      "id": "rai-spiral-tower-two",
+      "input_generation_seconds": 500,
+      "offline_seconds": 20,
+      "online": true
+    },
+    {
+      "id": "rai-mobile-strut",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": false,
+      "online_exclusion": "Explicitly excluded because its first solution takes about 559 seconds."
+    },
+    {
+      "id": "rai-three-robot-truss",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-welding",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-pyramid",
+      "input_generation_seconds": 500,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-box-stacking",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-mobile-wall-four",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "rai-spiral-tower",
+      "input_generation_seconds": 1000,
+      "offline_seconds": 30,
+      "online": true
+    },
+    {
+      "id": "assembly-cross-4r-openarm",
+      "input_generation_seconds": 300,
+      "offline_seconds": 30,
+      "online": true,
+      "assembly_revision": "db09fada24e47ab19148f75574df84703b14b068"
+    },
+    {
+      "id": "assembly-car-mini-4r-openarm",
+      "input_generation_seconds": 300,
+      "offline_seconds": 30,
+      "online": true,
+      "assembly_revision": "10a7ff87aa6940b765ff3bcf88ee17a366d67534"
+    }
+  ],
+  "blog_cases": [
+    "rai-random-2d",
+    "rai-box-rearrangement",
+    "rai-spiral-tower",
+    "assembly-car-mini-4r-openarm"
+  ],
+  "validation": {
+    "input": [
+      "environment_fingerprint",
+      "strict_full_edge_collision_certificate",
+      "terminal_mode",
+      "native_valid_plan_when_available"
+    ],
+    "offline_output": [
+      "same_environment_fingerprint",
+      "same_endpoints",
+      "same_complete_mode_sequence",
+      "terminal_mode",
+      "strict_full_edge_collision_certificate",
+      "native_valid_plan_when_available"
+    ],
+    "online_output": [
+      "same_environment_fingerprint",
+      "same_planner_seed_as_saved_input",
+      "same_first_solution_cost_as_saved_input",
+      "at_least_100_seconds_after_first_solution",
+      "terminal_mode",
+      "strict_full_edge_collision_certificate",
+      "native_valid_plan_when_available"
+    ],
+    "failed_cell_policy": "Never replace a failed seed or path. Preserve its log, record it as missing, and rerun only the identical cell after fixing an infrastructure failure."
+  },
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c",
+    "mr_bench_note": "This is the clean tracked revision used by the latest experiments; publish this commit or an equivalent tagged revision before public release.",
+    "assembly_revisions_are_case_specific": true,
+    "dependency_file": "pyproject.toml",
+    "content_lock": "benchmark/final/protocol.lock.json"
+  },
+  "outputs": {
+    "inputs": "inputs/<case>/path<path_index>.json",
+    "offline": "offline/results/<case>/<method>-path<path_index>-seed<shortcut_seed>.json",
+    "online": "online/results/<case>/<method>-path<path_index>-seed<shortcut_seed>.json",
+    "planner_only": "online/results/<case>/planner_only-path<path_index>.json",
+    "logs": "<phase>/logs/<case>/...",
+    "summary": "analysis/summary.json"
+  }
+}

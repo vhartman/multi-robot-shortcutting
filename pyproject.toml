@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mr-shortcutting"
+version = "0.1.0"
+description = "Reusable multi-robot shortcutting policies and reproducible benchmarks"
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+  "multi-robot-multi-goal-path-planning @ git+https://github.com/vhartman/multirobot-pathplanning-benchmark.git@3142dacfbfc22d619f52d69d07164eacae21b26c",
+  "numpy==1.26.4",
+  "matplotlib==3.10.1",
+  "rtree==1.4.1",
+  "scipy==1.11.4",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mr_shortcutting"]

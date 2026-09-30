@@ -1,0 +1,118 @@
+{
+  "schema": "mr-shortcut-benchmark-manifest-v1",
+  "cost": {
+    "per_agent": "euclidean",
+    "reduction": "max"
+  },
+  "cases": [
+    {
+      "id": "rai-random-2d",
+      "kind": "mrbench",
+      "environment": "rai.random_2d",
+      "environment_seed": 2,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-2d-handover",
+      "kind": "mrbench",
+      "environment": "rai.2d_handover",
+      "environment_seed": 2,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-bottles",
+      "kind": "mrbench",
+      "environment": "rai.bottles",
+      "environment_seed": 2,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-box-rearrangement",
+      "kind": "mrbench",
+      "environment": "rai.box_rearrangement",
+      "environment_seed": 2,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-box-reorientation",
+      "kind": "mrbench",
+      "environment": "rai.box_reorientation",
+      "environment_seed": 2,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-spiral-tower-two",
+      "kind": "mrbench",
+      "environment": "rai.spiral_tower_two",
+      "environment_seed": 0,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-mobile-strut",
+      "kind": "mrbench",
+      "environment": "rai.mobile_strut",
+      "environment_seed": 0,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-three-robot-truss",
+      "kind": "mrbench",
+      "environment": "rai.three_robot_truss",
+      "environment_seed": 7,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-welding",
+      "kind": "mrbench",
+      "environment": "rai.welding",
+      "environment_seed": 2,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-pyramid",
+      "kind": "mrbench",
+      "environment": "rai.pyramid",
+      "environment_seed": 2,
+      "planning_seconds": 500
+    },
+    {
+      "id": "rai-box-stacking",
+      "kind": "mrbench",
+      "environment": "rai.box_stacking",
+      "environment_seed": 2,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-mobile-wall-four",
+      "kind": "mrbench",
+      "environment": "rai.mobile_wall_four",
+      "environment_seed": 2,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "rai-spiral-tower",
+      "kind": "mrbench",
+      "environment": "rai.spiral_tower",
+      "environment_seed": 0,
+      "planning_seconds": 1000
+    },
+    {
+      "id": "assembly-cross-4r-openarm",
+      "kind": "assembly",
+      "environment_seed": 11023,
+      "planning_seconds": 300,
+      "assembly_revision": "db09fada24e47ab19148f75574df84703b14b068",
+      "plan": "fixtures/assembly/cross-4r-openarm-plan.json",
+      "export": "fixtures/assembly/cross-4r-openarm-path.json"
+    },
+    {
+      "id": "assembly-car-mini-4r-openarm",
+      "kind": "assembly",
+      "environment_seed": 11,
+      "planning_seconds": 300,
+      "assembly_revision": "10a7ff87aa6940b765ff3bcf88ee17a366d67534",
+      "plan": "fixtures/assembly/car-mini-4r-openarm-plan.json",
+      "export": "fixtures/assembly/car-mini-4r-openarm-path.json"
+    }
+  ]
+}

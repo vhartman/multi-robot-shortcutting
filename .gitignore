@@ -1,0 +1,22 @@
+# Local environments and Python build products
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+*.orig
+z.log.global
+
+# Generated benchmark artifacts. Source fixtures and protocols stay tracked.
+benchmark/final/inputs/
+benchmark/final/offline/
+benchmark/final/online/
+benchmark/final/analysis/
+benchmark/final/execution-audit.jsonl
+**/results/
+**/plots/
+**/logs/
+*.log

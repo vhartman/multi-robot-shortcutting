@@ -1,0 +1,39 @@
+{
+  "schema": "mr-shortcut-final-content-lock-v1",
+  "protocol_sha256": "39b50e926bc2623774e67c0d1025c8ebc54c8f9c48b2e7a66916fce28e26eec2",
+  "files": {
+    "pyproject.toml": "d815926f9cf3e4b06146bf1285294f33da48fa5f81fb1b572bb0fd3a15f31572",
+    "benchmark/manifest.json": "49ce355a5b3f72952a7bbc7ba9c7cefabd3a451c67bea86153a8ddbf7843db70",
+    "benchmark/common.py": "0639cc93c7f075d678305a469e93d20da200e40e2969f4a5e937ee86da56ce71",
+    "benchmark/assembly_loader.py": "8c32ff37b29967da2f9aa8f8c4f5948a2ab0b925c06bdf0c655965f671d17f7d",
+    "benchmark/fixtures/assembly/cross-4r-openarm-plan.json": "f5c53e3be287ef56bdd825b82ac47073b6bdc1fe8d823ec2a7369082c5109965",
+    "benchmark/fixtures/assembly/cross-4r-openarm-path.json": "a8138673da62aec4ac750d70b485fbfa70e826064f84a5c9cfeb1bd87c7e0425",
+    "benchmark/fixtures/assembly/car-mini-4r-openarm-plan.json": "4a6d91463d9f3285c99c61726a0ab2c5a5b87e20b8de0bcf79716bbba7e36a6e",
+    "benchmark/fixtures/assembly/car-mini-4r-openarm-path.json": "8b45e17ea1d1c8731babedade54c2c813af3e67b1e005bb1c14dd4b47670636c",
+    "benchmark/online.py": "58e386d1edbfee24e0ff4c3702eda325cb9966007debd138b3432e88b3751cf0",
+    "src/mr_shortcutting/api.py": "d6f8c4664c0888128368e9fcb53c38ffc11516740229c9ac6f01cbdcd90fc8bd",
+    "src/mr_shortcutting/shortcutters.py": "4f60c6d7ad187a755aca0c072a5e7d5e5fdbe64a78e7eba38c2eacda661d99c1",
+    "src/mr_shortcutting/__init__.py": "0ec254f25821376b84792b8c1a7f554ef8854404d35b351e41477d7ab2d12318",
+    "benchmark/final/protocol.json": "39b50e926bc2623774e67c0d1025c8ebc54c8f9c48b2e7a66916fce28e26eec2",
+    "benchmark/final/protocol_lib.py": "74fd6c6e9d893a104e2b3e52ca1a997a748f9982cac35b5bc12d49862cb43b9c",
+    "benchmark/final/generate_input.py": "fa9d36acf0a2ab60e11a7112384e02a38a5cd929e24bd13de9e140cea5713577",
+    "benchmark/final/run_offline_cell.py": "455835c77b1328bb73fc74df28c0870cbae8fb2e1df6d67e7d02a71141b88a4f",
+    "benchmark/final/run_online_cell.py": "16d1194133b100b80bc7b933edd25f8e688cfb009d6140010c9c3fe4e2340372",
+    "benchmark/final/run.py": "4ca3de02e492daed6270a306e72d7a4e5ea36f815cf09e0e223c4cfef03d6fee",
+    "benchmark/final/validate.py": "6b2af3d4ed2ece5a4abcb33e986245ce28fc83da1ea71c85167345d03e35d402",
+    "benchmark/final/analyze.py": "55fb339350b99285511cf80ae18b3dccde5edea048303dbf6f3ca26672c7b22c",
+    "benchmark/final/lock_protocol.py": "48b03787a1974395bef2da8522aac167d80a1cc01f3eb85a4b95b41abeb801c5"
+  },
+  "external": {
+    "mr_bench": {
+      "revision": "3142dacfbfc22d619f52d69d07164eacae21b26c",
+      "required_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c",
+      "tracked_changes": []
+    },
+    "assembly_revisions": {
+      "assembly-cross-4r-openarm": "db09fada24e47ab19148f75574df84703b14b068",
+      "assembly-car-mini-4r-openarm": "10a7ff87aa6940b765ff3bcf88ee17a366d67534"
+    }
+  },
+  "python": "3.10.12"
+}
