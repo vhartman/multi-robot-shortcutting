@@ -39,6 +39,8 @@ LOCKED_FILES = (
     "benchmark/final/run.py",
     "benchmark/final/validate.py",
     "benchmark/final/analyze.py",
+    "benchmark/plot_style.py",
+    "benchmark/final/adopt_prior_work.py",
     "benchmark/final/lock_protocol.py",
 )
 
@@ -250,8 +252,8 @@ def validate_protocol_definition() -> list[str]:
         errors.append(f"policy registry check failed: {error}")
     if data["design"]["execution"] != "strictly_serial":
         errors.append("final execution must remain strictly serial")
-    if data["online"]["shortcut_checks_per_call"] != 250:
-        errors.append("final online check budget must remain 250")
+    if data["online"]["shortcut_checks_per_call"] != 100:
+        errors.append("final online check budget must match prior work: 100")
     return errors
 
 

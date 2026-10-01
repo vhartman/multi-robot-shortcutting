@@ -1,8 +1,8 @@
 {
   "schema": "mr-shortcut-final-protocol-v1",
-  "status": "frozen-no-results",
+  "status": "frozen-ready-for-final-four-method-run",
   "frozen_on": "2026-09-30",
-  "purpose": "Final offline and planning-in-the-loop comparison for the multi-robot shortcutting article.",
+  "purpose": "Final four-environment 3-path by 3-seed comparison for the multi-robot shortcutting article.",
   "cost": {
     "per_robot_metric": "euclidean",
     "implementation_metric": "euclidean",
@@ -44,43 +44,57 @@
       "id": "single_robot_mode",
       "label": "random robot + compatible run",
       "offline_policy": "single_robot_mode",
-      "online_policy": "single_robot_mode"
+      "online_policy": "single_robot_mode",
+      "data": "existing_prior_work"
     },
     {
       "id": "robot_subset_mode",
       "label": "random robot subset + compatible run",
       "offline_policy": "robot_subset_mode",
-      "online_policy": "robot_subset_mode"
+      "online_policy": "robot_subset_mode",
+      "data": "existing_prior_work"
+    },
+    {
+      "id": "wafr_single_robot",
+      "label": "WAFR single robot",
+      "offline_policy": "wafr_single_robot",
+      "online_policy": "wafr_single_robot",
+      "data": "existing_prior_work"
     },
     {
       "id": "huang_round_robin_no_prioritized",
       "label": "Huang round robin, no priority",
       "offline_policy": "huang_round_robin_no_prioritized",
-      "online_policy": "huang_round_robin_no_prioritized"
+      "online_policy": "huang_round_robin_no_prioritized",
+      "data": "existing_prior_work"
     },
     {
       "id": "tree_gain",
       "label": "tree + gain (standard)",
       "offline_policy": "tree_prefix",
-      "online_policy": "upstream_tree"
+      "online_policy": "upstream_tree",
+      "data": "pending_final_run"
     },
     {
       "id": "tree_group_gain",
       "label": "tree + group gain",
       "offline_policy": "tree_group_gain",
-      "online_policy": "tree_group_gain"
+      "online_policy": "tree_group_gain",
+      "data": "pending_final_run"
     },
     {
       "id": "gain_only",
       "label": "gain only",
       "offline_policy": "gain_only",
-      "online_policy": "gain_only"
+      "online_policy": "gain_only",
+      "data": "pending_final_run"
     },
     {
       "id": "full_tree_gain_round_robin",
       "label": "full/tree/gain round robin",
       "offline_policy": "full_tree_gain_round_robin",
-      "online_policy": "full_tree_gain_round_robin"
+      "online_policy": "full_tree_gain_round_robin",
+      "data": "pending_final_run"
     }
   ],
   "offline": {
@@ -95,13 +109,13 @@
   "online": {
     "planner": "BidirectionalRRTstar",
     "optimize": true,
-    "shortcut_checks_per_call": 250,
+    "shortcut_checks_per_call": 100,
     "planner_default_shortcut_checks_per_call": 100,
-    "refinement_seconds_after_first_solution": 100,
-    "replay_margin_seconds": 15,
+    "refinement_seconds_after_first_solution": 30,
+    "replay_margin_seconds": 5,
     "runtime_rule": "ceil(saved_first_solution_wall_seconds) + refinement_seconds_after_first_solution + replay_margin_seconds",
     "analysis_time_origin": "first_solution",
-    "analysis_horizon_seconds": 100,
+    "analysis_horizon_seconds": 30,
     "include_planner_only_control": true,
     "planner_only_repetitions": "once_per_initial_path",
     "no_uncharged_final_shortcut_pass": true
@@ -114,68 +128,7 @@
       "online": true
     },
     {
-      "id": "rai-2d-handover",
-      "input_generation_seconds": 500,
-      "offline_seconds": 10,
-      "online": true
-    },
-    {
-      "id": "rai-bottles",
-      "input_generation_seconds": 500,
-      "offline_seconds": 20,
-      "online": true
-    },
-    {
       "id": "rai-box-rearrangement",
-      "input_generation_seconds": 1000,
-      "offline_seconds": 30,
-      "online": true
-    },
-    {
-      "id": "rai-box-reorientation",
-      "input_generation_seconds": 500,
-      "offline_seconds": 20,
-      "online": true
-    },
-    {
-      "id": "rai-spiral-tower-two",
-      "input_generation_seconds": 500,
-      "offline_seconds": 20,
-      "online": true
-    },
-    {
-      "id": "rai-mobile-strut",
-      "input_generation_seconds": 1000,
-      "offline_seconds": 30,
-      "online": false,
-      "online_exclusion": "Explicitly excluded because its first solution takes about 559 seconds."
-    },
-    {
-      "id": "rai-three-robot-truss",
-      "input_generation_seconds": 1000,
-      "offline_seconds": 30,
-      "online": true
-    },
-    {
-      "id": "rai-welding",
-      "input_generation_seconds": 1000,
-      "offline_seconds": 30,
-      "online": true
-    },
-    {
-      "id": "rai-pyramid",
-      "input_generation_seconds": 500,
-      "offline_seconds": 30,
-      "online": true
-    },
-    {
-      "id": "rai-box-stacking",
-      "input_generation_seconds": 1000,
-      "offline_seconds": 30,
-      "online": true
-    },
-    {
-      "id": "rai-mobile-wall-four",
       "input_generation_seconds": 1000,
       "offline_seconds": 30,
       "online": true
@@ -185,13 +138,6 @@
       "input_generation_seconds": 1000,
       "offline_seconds": 30,
       "online": true
-    },
-    {
-      "id": "assembly-cross-4r-openarm",
-      "input_generation_seconds": 300,
-      "offline_seconds": 30,
-      "online": true,
-      "assembly_revision": "db09fada24e47ab19148f75574df84703b14b068"
     },
     {
       "id": "assembly-car-mini-4r-openarm",
@@ -226,12 +172,14 @@
       "same_environment_fingerprint",
       "same_planner_seed_as_saved_input",
       "same_first_solution_cost_as_saved_input",
-      "at_least_100_seconds_after_first_solution",
+      "at_least_30_seconds_after_first_solution",
+      "100_collision_checks_per_shortcut_call",
       "terminal_mode",
       "strict_full_edge_collision_certificate",
       "native_valid_plan_when_available"
     ],
-    "failed_cell_policy": "Never replace a failed seed or path. Preserve its log, record it as missing, and rerun only the identical cell after fixing an infrastructure failure."
+    "shortcut_candidate_endpoint_policy": "Copy proposal endpoints exactly; interpolate strict interior states only.",
+    "failed_cell_policy": "Never replace a failed seed or path. Preserve its log and seed identity. After identifying and fixing the root cause, rerun the identical cell and every other cell affected by the implementation change."
   },
   "software": {
     "python": "3.10.12",
@@ -248,5 +196,21 @@
     "planner_only": "online/results/<case>/planner_only-path<path_index>.json",
     "logs": "<phase>/logs/<case>/...",
     "summary": "analysis/summary.json"
+  },
+  "reuse": {
+    "source_schema": "prior-work-multipath 3-path by 3-seed results",
+    "existing_method_ids": [
+      "single_robot_mode",
+      "robot_subset_mode",
+      "wafr_single_robot",
+      "huang_round_robin_no_prioritized"
+    ],
+    "pending_method_ids": [
+      "tree_gain",
+      "tree_group_gain",
+      "gain_only",
+      "full_tree_gain_round_robin"
+    ],
+    "adoption_rule": "Import only after validating input fingerprint, seed, cost, budget, certificates, collision-check budget, and online post-solution horizon."
   }
 }

@@ -1,0 +1,61 @@
+{
+  "schema": "mr-shortcut-broad-offline-v1",
+  "status": "first-pass",
+  "purpose": "One-path, three-seed offline comparison on the eleven manifest cases outside the final blog four.",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "shortcut_seeds": [0, 1, 2],
+  "cost": {
+    "per_agent": "euclidean",
+    "reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2"
+  },
+  "methods": [
+    {
+      "id": "single_robot_mode",
+      "label": "random robot + compatible run",
+      "policy": "single_robot_mode"
+    },
+    {
+      "id": "tree_gain",
+      "label": "tree + gain",
+      "policy": "tree_prefix"
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain",
+      "policy": "tree_group_gain"
+    }
+  ],
+  "cases": [
+    {"id": "rai-2d-handover", "seconds": 10},
+    {"id": "rai-bottles", "seconds": 20},
+    {"id": "rai-box-reorientation", "seconds": 20, "pythonhashseed": 1},
+    {"id": "rai-spiral-tower-two", "seconds": 20},
+    {"id": "rai-mobile-strut", "seconds": 30, "source_schema": "mr-shortcut-benchmark-path-v1"},
+    {"id": "rai-three-robot-truss", "seconds": 30},
+    {"id": "rai-welding", "seconds": 30},
+    {"id": "rai-pyramid", "seconds": 30},
+    {"id": "rai-box-stacking", "seconds": 30},
+    {"id": "rai-mobile-wall-four", "seconds": 30},
+    {"id": "assembly-cross-4r-openarm", "seconds": 30}
+  ],
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c",
+    "assembly_cross_revision": "db09fada24e47ab19148f75574df84703b14b068"
+  },
+  "aggregation": {
+    "center": "pointwise_median_over_three_shortcut_seeds",
+    "uncertainty": "minimum_to_maximum_over_three_shortcut_seeds"
+  },
+  "validation": [
+    "source_environment_fingerprint",
+    "same_endpoints",
+    "same_complete_mode_sequence",
+    "terminal_mode",
+    "strict_full_edge_collision_certificate",
+    "native_valid_plan_when_available"
+  ]
+}

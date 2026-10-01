@@ -16,5 +16,8 @@ dependencies = [
   "scipy==1.11.4",
 ]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/mr_shortcutting"]

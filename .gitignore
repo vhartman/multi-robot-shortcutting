@@ -16,6 +16,9 @@ benchmark/final/offline/
 benchmark/final/online/
 benchmark/final/analysis/
 benchmark/final/execution-audit.jsonl
+benchmark/broad/inputs/
+benchmark/broad/analysis/
+benchmark/broad/execution-audit.jsonl
 **/results/
 **/plots/
 **/logs/

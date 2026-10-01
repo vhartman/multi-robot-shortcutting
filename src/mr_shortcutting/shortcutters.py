@@ -275,10 +275,14 @@ def _candidate(env, path, proposal: Proposal):
                         and path[i + offset].mode != path[i + offset - 1].mode
                     ):
                         interpolation_offset = max(0, interpolation_offset - 1)
-                    alpha = interpolation_offset / motion_steps
-                    flat[flat_offset : flat_offset + dimension] = (
-                        starts[robot] + increments[robot] * alpha
-                    )
+                    if interpolation_offset == 0:
+                        interpolated = starts[robot]
+                    elif interpolation_offset == motion_steps:
+                        interpolated = np.asarray(q1[robot], dtype=float)
+                    else:
+                        alpha = interpolation_offset / motion_steps
+                        interpolated = starts[robot] + increments[robot] * alpha
+                    flat[flat_offset : flat_offset + dimension] = interpolated
             flat_offset += dimension
         candidate.append(State(q0.from_flat(flat), path[i + offset].mode))
     return candidate

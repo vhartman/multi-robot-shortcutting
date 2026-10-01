@@ -71,14 +71,14 @@ python benchmark/final/run.py preflight \
   --assembly-repo /path/to/assembly
 ```
 
-Then run each phase serially:
+Adopt the completed prior-work 3×3 cells, then run the two missing phases serially:
 
 ```bash
-python benchmark/final/run.py execute --phase inputs --confirm \
+python benchmark/final/adopt_prior_work.py \
+  --source /path/to/prior-work-multipath --write
+python benchmark/final/run.py execute --phase offline --pending-only --confirm \
   --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
-python benchmark/final/run.py execute --phase offline --confirm \
-  --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
-python benchmark/final/run.py execute --phase online --confirm \
+python benchmark/final/run.py execute --phase online --pending-only --confirm \
   --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
 python benchmark/final/validate.py \
   --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly

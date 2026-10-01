@@ -16,6 +16,9 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
+BENCHMARK_ROOT = HERE.parent
+if str(BENCHMARK_ROOT) not in sys.path:
+    sys.path.insert(0, str(BENCHMARK_ROOT))
 
 from protocol_lib import (  # noqa: E402
     methods,
@@ -27,32 +30,13 @@ from protocol_lib import (  # noqa: E402
     read_json,
     write_json,
 )
+from plot_style import method_color, method_linestyle  # noqa: E402
 
 TITLES = {
     "rai-random-2d": "Random 2D",
     "rai-box-rearrangement": "Box rearrangement",
     "rai-spiral-tower": "Spiral tower",
     "assembly-car-mini-4r-openarm": "Car assembly",
-}
-COLORS = {
-    "planner_only": "#000000",
-    "single_robot_mode": "#1b9e77",
-    "robot_subset_mode": "#1f78b4",
-    "huang_round_robin_no_prioritized": "#984ea3",
-    "tree_gain": "#e66101",
-    "tree_group_gain": "#d73027",
-    "gain_only": "#7570b3",
-    "full_tree_gain_round_robin": "#008695",
-}
-LINESTYLES = {
-    "planner_only": ":",
-    "single_robot_mode": "--",
-    "robot_subset_mode": "--",
-    "huang_round_robin_no_prioritized": "-.",
-    "tree_gain": "-",
-    "tree_group_gain": "-",
-    "gain_only": "--",
-    "full_tree_gain_round_robin": "-",
 }
 
 
@@ -131,7 +115,6 @@ def load_path_curves(
             )
     return path_curves, run_count
 
-
 def first_positive_time(
     phase: str, case_id: str, allow_incomplete: bool
 ) -> float:
@@ -179,7 +162,6 @@ def aggregate(
         "normalized_auc": float(np.trapz(median, grid) / grid[-1]),
     }
 
-
 def plot_blog(
     phase: str, log_x: bool, allow_incomplete: bool
 ) -> Path:
@@ -206,13 +188,13 @@ def plot_blog(
             line = axis.plot(
                 grid,
                 stats["median"],
-                color=COLORS[method_id],
-                linestyle=LINESTYLES[method_id],
+                color=method_color(method_id),
+                linestyle=method_linestyle(method_id),
                 linewidth=4.0 if method_id == "planner_only" else 3.6,
             )[0]
             axis.fill_between(
                 grid, stats["low"], stats["high"],
-                color=COLORS[method_id], alpha=0.07, linewidth=0,
+                color=method_color(method_id), alpha=0.07, linewidth=0,
             )
             handles[method_id] = line
         if log_x:

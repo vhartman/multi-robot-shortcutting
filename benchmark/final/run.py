@@ -332,15 +332,23 @@ def add_filters(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--phase", choices=("inputs", "offline", "online", "all"), default="all")
     parser.add_argument("--case", action="append", choices=tuple(protocol_cases()))
     parser.add_argument("--method", action="append", choices=tuple(methods()))
+    parser.add_argument(
+        "--pending-only", action="store_true",
+        help="select the four methods without adopted prior-work data",
+    )
     parser.add_argument("--path-index", action="append", type=int, choices=tuple(protocol()["design"]["path_indices"]))
     parser.add_argument("--shortcut-seed", action="append", type=int, choices=tuple(protocol()["design"]["shortcut_seeds"]))
 
 
 def schedule_for(args, phase: str) -> list[Cell]:
+    method_filter = (
+        protocol()["reuse"]["pending_method_ids"]
+        if args.pending_only else args.method
+    )
     return cells(
         phase,
         args.case,
-        args.method,
+        method_filter,
         args.path_index,
         args.shortcut_seed,
     )
@@ -358,6 +366,8 @@ def main() -> int:
     execute_parser.add_argument("--confirm", action="store_true", help="required safety acknowledgement")
     execute_parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
+    if args.pending_only and args.method:
+        parser.error("--pending-only cannot be combined with --method")
     if args.mr_bench_repo is not None:
         os.environ["MR_BENCH_REPO"] = str(args.mr_bench_repo.expanduser().resolve())
     if args.assembly_repo is not None:
@@ -366,24 +376,43 @@ def main() -> int:
     phases = ("inputs", "offline", "online") if args.phase == "all" else (args.phase,)
     case_ids = selected(args.case, protocol_cases())
     if args.command == "plan":
-        counts = {phase: len(schedule_for(args, phase)) for phase in phases}
+        by_phase = {}
+        scheduled_by_phase = {phase: schedule_for(args, phase) for phase in phases}
+        for phase, phase_cells in scheduled_by_phase.items():
+            states = {"valid": 0, "missing": 0, "invalid": 0}
+            for cell in phase_cells:
+                errors = artifact_errors(cell)
+                key = "valid" if not errors else ("missing" if errors == ["missing"] else "invalid")
+                states[key] += 1
+            by_phase[phase] = {"expected": len(phase_cells), **states}
+        missing_offline = [
+            cell for cell in scheduled_by_phase.get("offline", [])
+            if artifact_errors(cell) == ["missing"]
+        ]
+        missing_online = [
+            cell for cell in scheduled_by_phase.get("online", [])
+            if artifact_errors(cell) == ["missing"]
+        ]
         offline_seconds = sum(
             float(protocol_cases()[cell.case_id]["offline_seconds"])
-            for cell in schedule_for(args, "offline")
-        ) if "offline" in phases else 0.0
+            for cell in missing_offline
+        )
         online_refinement_seconds = (
-            len(schedule_for(args, "online"))
+            len(missing_online)
             * float(protocol()["online"]["refinement_seconds_after_first_solution"])
-            if "online" in phases else 0.0
         )
         print(json.dumps({
             "protocol": str(LOCK_PATH.relative_to(REPO)),
             "protocol_sha256": protocol_sha256(),
-            "counts": counts,
-            "total_cells": sum(counts.values()),
-            "offline_nominal_hours": offline_seconds / 3600.0,
-            "online_refinement_only_hours": online_refinement_seconds / 3600.0,
-            "note": "Online total also includes first-solution replay and a 15-second margin per cell.",
+            "cells": by_phase,
+            "expected_total": sum(value["expected"] for value in by_phase.values()),
+            "missing_total": sum(value["missing"] for value in by_phase.values()),
+            "missing_offline_nominal_hours": offline_seconds / 3600.0,
+            "missing_online_refinement_only_hours": online_refinement_seconds / 3600.0,
+            "note": (
+                "Online total also includes first-solution replay and a "
+                f"{protocol()['online']['replay_margin_seconds']}-second margin per missing cell."
+            ),
         }, indent=2))
         return 0
 
