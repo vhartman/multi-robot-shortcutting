@@ -1,0 +1,604 @@
+{
+  "schema": "mr-shortcut-expanded-offline-v1",
+  "status": "prepared-not-run",
+  "purpose": "Expanded offline comparison on the original 30 scenarios plus isolated box-stacking with one through six robots and four boxes per robot.",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "shortcut_seeds": [
+    0,
+    1,
+    2
+  ],
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "methods": [
+    {
+      "id": "single_robot_mode",
+      "label": "random robot + compatible run",
+      "policy": "single_robot_mode",
+      "tracks": [
+        "broad",
+        "scaling"
+      ]
+    },
+    {
+      "id": "tree_gain",
+      "label": "tree + gain",
+      "policy": "tree_prefix",
+      "tracks": [
+        "broad",
+        "scaling"
+      ]
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain",
+      "policy": "tree_group_gain",
+      "tracks": [
+        "broad",
+        "scaling"
+      ]
+    },
+    {
+      "id": "full_tree_gain_round_robin",
+      "label": "full/tree/gain round robin",
+      "policy": "full_tree_gain_round_robin",
+      "tracks": [
+        "broad",
+        "scaling"
+      ]
+    },
+    {
+      "id": "full_configuration",
+      "label": "full configuration",
+      "policy": "full_configuration",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "robot_subset_mode",
+      "label": "random robot subset + compatible run",
+      "policy": "robot_subset_mode",
+      "tracks": [
+        "scaling"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "rai-simple",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.simple",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-dep-piano",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.dep_piano",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-2d-handover",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.2d_handover",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-random-2d",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.random_2d",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-other-hallway",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.other_hallway",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-three-agents",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.three_agents",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-triple-waypoints",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.triple_waypoints",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-welding",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.welding",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-handover",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.handover",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-eggcartons",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.eggcartons",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-bottles",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.bottles",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-box-rearrangement",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.box_rearrangement",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-box-reorientation",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.box_reorientation",
+      "environment_seed": 2,
+      "pythonhashseed": 1,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-pyramid",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.pyramid",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-box-stacking",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.box_stacking",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-dep-box-stacking",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.dep_box_stacking",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-mobile-wall-four",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.mobile_wall_four",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-dep-mobile-wall-four",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.dep_mobile_wall_four",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-mobile-strut",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.mobile_strut",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-three-robot-truss",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.three_robot_truss",
+      "environment_seed": 7,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-spiral-tower",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.spiral_tower",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-spiral-tower-two",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.spiral_tower_two",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-cube-four",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.cube_four",
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-unordered-box-reorientation",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.unordered_box_reorientation",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-unassigned-tsp",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.unassigned_tsp",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-unassigned-cleanup",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.unassigned_cleanup",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 20,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-unassigned-stacking",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.unassigned_stacking",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "rai-unordered-bottles",
+      "track": "broad",
+      "kind": "mrbench",
+      "environment": "rai.unordered_bottles",
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 10,
+      "path_indices": [
+        0
+      ],
+      "input": "archive"
+    },
+    {
+      "id": "assembly-cross-4r-openarm",
+      "track": "broad",
+      "kind": "assembly",
+      "environment_seed": 11023,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive",
+      "assembly_revision": "db09fada24e47ab19148f75574df84703b14b068"
+    },
+    {
+      "id": "assembly-car-mini-4r-openarm",
+      "track": "broad",
+      "kind": "assembly",
+      "environment_seed": 11,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0
+      ],
+      "input": "archive",
+      "assembly_revision": "10a7ff87aa6940b765ff3bcf88ee17a366d67534"
+    },
+    {
+      "id": "rai-isolated-box-stacking-r1-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 1,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-isolated-box-stacking-r2-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 2,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-isolated-box-stacking-r3-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 3,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-isolated-box-stacking-r4-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 4,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-isolated-box-stacking-r5-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 5,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-isolated-box-stacking-r6-b4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_isolated_arm_box_stack_env",
+      "environment_kwargs": {
+        "num_robots": 6,
+        "num_boxes": 4
+      },
+      "environment_seed": 0,
+      "pythonhashseed": 0,
+      "seconds": 30,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 1800
+    }
+  ],
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c"
+  },
+  "aggregation": {
+    "within_path": "pointwise_median_over_shortcut_seeds",
+    "across_paths": "pointwise_median_over_initial_paths",
+    "uncertainty_multiple_paths": "minimum_to_maximum_across_path_medians",
+    "uncertainty_single_path": "minimum_to_maximum_over_shortcut_seeds",
+    "normalization": "divide_by_each_initial_path_cost"
+  },
+  "retained_diagnostics": [
+    "accepted cost-time trace",
+    "collision checks at every accepted improvement",
+    "draw, compatibility, cost-gate, collision-check, and acceptance counts",
+    "valid and invalid collision-check time",
+    "accepted shortcut endpoint, robot-subset, gain, check-time, and surviving-lineage data"
+  ]
+}
