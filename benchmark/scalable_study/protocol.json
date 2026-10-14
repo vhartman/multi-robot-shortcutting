@@ -1,0 +1,224 @@
+{
+  "schema": "mr-shortcut-scalable-study-v1",
+  "status": "prepared-not-run",
+  "purpose": "Offline evaluation of scalable tree/group shortcutting on the broad benchmark and three robot-count scaling studies.",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "path_indices": [0, 1, 2],
+  "shortcut_seeds": [0, 1, 2],
+  "expected_case_counts": {
+    "broad": 30,
+    "isolated_box_stacking": 6,
+    "disk_scaling": 6,
+    "coupled_box_stacking": 5
+  },
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "methods": [
+    {
+      "id": "tree_gain",
+      "label": "tree + gain (standard)",
+      "policy": "tree_prefix"
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain (previous best)",
+      "policy": "tree_group_gain"
+    },
+    {
+      "id": "scalable_tree_group",
+      "label": "scalable tree + group",
+      "policy": "scalable_tree_group"
+    }
+  ],
+  "case_sets": [
+    {
+      "family": "broad",
+      "source_protocol": "benchmark/expanded/protocol.json",
+      "source_protocol_sha256": "f20b24e01ca44a63fb75f5d1a95ace0683cf68321b428c6e5f0c679a7ca49254",
+      "source_track": "broad",
+      "existing_input_root": "benchmark/expanded/inputs",
+      "seconds_overrides": {
+        "rai-simple": 2,
+        "rai-dep-piano": 2,
+        "rai-2d-handover": 5,
+        "rai-random-2d": 15,
+        "rai-other-hallway": 5,
+        "rai-three-agents": 5,
+        "rai-triple-waypoints": 10,
+        "rai-welding": 10,
+        "rai-handover": 2,
+        "rai-eggcartons": 10,
+        "rai-bottles": 10,
+        "rai-box-rearrangement": 20,
+        "rai-box-reorientation": 10,
+        "rai-pyramid": 10,
+        "rai-box-stacking": 15,
+        "rai-dep-box-stacking": 20,
+        "rai-mobile-wall-four": 30,
+        "rai-dep-mobile-wall-four": 20,
+        "rai-mobile-strut": 30,
+        "rai-three-robot-truss": 30,
+        "rai-spiral-tower": 30,
+        "rai-spiral-tower-two": 15,
+        "rai-cube-four": 30,
+        "rai-unordered-box-reorientation": 10,
+        "rai-unassigned-tsp": 2,
+        "rai-unassigned-cleanup": 2,
+        "rai-unassigned-stacking": 10,
+        "rai-unordered-bottles": 2,
+        "assembly-cross-4r-openarm": 30,
+        "assembly-car-mini-4r-openarm": 30
+      },
+      "input_generation_seconds_default": 1000,
+      "input_generation_seconds_overrides": {
+        "assembly-cross-4r-openarm": 300,
+        "assembly-car-mini-4r-openarm": 300
+      }
+    },
+    {
+      "family": "isolated_box_stacking",
+      "source_protocol": "benchmark/expanded/protocol.json",
+      "source_protocol_sha256": "f20b24e01ca44a63fb75f5d1a95ace0683cf68321b428c6e5f0c679a7ca49254",
+      "source_track": "scaling",
+      "existing_input_root": "benchmark/expanded/inputs"
+    },
+    {
+      "family": "disk_scaling",
+      "source_protocol": "benchmark/scaling_2d/protocol.json",
+      "source_protocol_sha256": "e05714964652021ae0aeeb00c9f1148dd77887f3192cd402eb1b827848445c50",
+      "source_track": "scaling",
+      "existing_input_root": "benchmark/scaling_2d/inputs",
+      "input_generation_overrides": {
+        "rai-disk-scaling-r10-g4": {
+          "seconds": 900,
+          "stepsize": 0.25,
+          "sampler": "gibbs_random_scan",
+          "home_bias": 1.0
+        },
+        "rai-disk-scaling-r12-g4": {
+          "seconds": 900,
+          "stepsize": 0.25,
+          "sampler": "gibbs_random_scan",
+          "home_bias": 1.0
+        }
+      }
+    }
+  ],
+  "explicit_cases": [
+    {
+      "id": "rai-coupled-box-stacking-r2-b8",
+      "family": "coupled_box_stacking",
+      "kind": "mrbench",
+      "constructor": "coupled_box_stacking_env",
+      "environment_kwargs": {
+        "num_robots": 2,
+        "num_boxes": 8,
+        "environment_seed": 10
+      },
+      "environment_seed": 10,
+      "seconds": 30,
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-coupled-box-stacking-r3-b8",
+      "family": "coupled_box_stacking",
+      "kind": "mrbench",
+      "constructor": "coupled_box_stacking_env",
+      "environment_kwargs": {
+        "num_robots": 3,
+        "num_boxes": 8,
+        "environment_seed": 10
+      },
+      "environment_seed": 10,
+      "seconds": 30,
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-coupled-box-stacking-r4-b8",
+      "family": "coupled_box_stacking",
+      "kind": "mrbench",
+      "constructor": "coupled_box_stacking_env",
+      "environment_kwargs": {
+        "num_robots": 4,
+        "num_boxes": 8,
+        "environment_seed": 10
+      },
+      "environment_seed": 10,
+      "seconds": 30,
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-coupled-box-stacking-r5-b8",
+      "family": "coupled_box_stacking",
+      "kind": "mrbench",
+      "constructor": "coupled_box_stacking_env",
+      "environment_kwargs": {
+        "num_robots": 5,
+        "num_boxes": 8,
+        "environment_seed": 10
+      },
+      "environment_seed": 10,
+      "seconds": 30,
+      "input_generation_seconds": 1800
+    },
+    {
+      "id": "rai-coupled-box-stacking-r6-b8",
+      "family": "coupled_box_stacking",
+      "kind": "mrbench",
+      "constructor": "coupled_box_stacking_env",
+      "environment_kwargs": {
+        "num_robots": 6,
+        "num_boxes": 8,
+        "environment_seed": 10
+      },
+      "environment_seed": 10,
+      "seconds": 30,
+      "input_generation_seconds": 1800
+    }
+  ],
+  "input_generation_defaults": {
+    "stepsize": 1.0,
+    "sampler": "auto",
+    "home_bias": 0.0
+  },
+  "offline": {
+    "interpolation_resolution": 0.5,
+    "budget_type": "shortcut_wall_clock_seconds",
+    "timer_excludes": [
+      "environment construction",
+      "input restoration and certification",
+      "final certification"
+    ]
+  },
+  "aggregation": {
+    "within_path": "pointwise median over shortcut seeds",
+    "across_paths": "pointwise median over initial paths",
+    "uncertainty": "minimum to maximum across path medians",
+    "weighting": "each initial path has equal weight",
+    "normalization": "divide by each initial path cost"
+  },
+  "thresholds_relative_improvement": [0.05, 0.1, 0.2],
+  "retained_diagnostics": [
+    "accepted cost-time trace",
+    "collision checks at every accepted improvement",
+    "draw, compatibility, cost-gate, collision-check, and acceptance counts",
+    "valid and invalid collision-check time",
+    "accepted shortcut endpoint, robot-group, gain, check-time, and surviving-lineage data"
+  ],
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c"
+  },
+  "source_hashes": {
+    "benchmark/scaling_2d/scalable_tree_group.py": "39de1aebcd4d4991b524ff47f638cac4588f14e7954f8ccddb17c21b51d2c32d",
+    "benchmark/scaling_coupled/environment.py": "93fbf471c64f89500f1df9c7a3a6c8f8a4d6dd775edde4099e214b97fb1c961f",
+    "src/mr_shortcutting/shortcutters.py": "dc8fa2c26b64b40d7c0353793065330a5b466d5637ce573cb44fd3d7b25c3f7e"
+  }
+}

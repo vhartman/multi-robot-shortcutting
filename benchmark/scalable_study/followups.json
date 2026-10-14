@@ -1,0 +1,37 @@
+{
+  "schema": "mr-shortcut-scalable-followups-v1",
+  "base_protocol_sha256": "447376098008f67cf88ff76a47d21685116953937e955dce0fd7f88ae496419c",
+  "offline": {
+    "method": "random_compatible_group",
+    "reference": "scalable_tree_group",
+    "cases": "all certified reference cells",
+    "minimum_cost_improvement": 0.000001
+  },
+  "online": {
+    "cases": [
+      "rai-spiral-tower",
+      "assembly-car-mini-4r-openarm",
+      "rai-coupled-box-stacking-r6-b8",
+      "rai-disk-scaling-r12-g4"
+    ],
+    "path_indices": [0, 1, 2],
+    "shortcut_seed": 0,
+    "methods": ["upstream_tree", "scalable_tree_group"],
+    "checks_per_call": 100,
+    "first_solution_cap_seconds": 200,
+    "refinement_seconds": 100,
+    "first_path_validation": "compare the two online policies at the same pre-shortcut hook; same planner seed, settings, configurations, mode task IDs, and cost; offline files supply configuration/seeds only",
+    "planner_rng": "restored around upstream shortcut calls; private generator for scalable policy",
+    "state_persistence": "fresh proposer for each incumbent shortcut call",
+    "deadline": "stop at next planner termination check; retain overrun but exclude events beyond refinement horizon from comparison",
+    "incumbent_rule": "certify every planner-reported incumbent after the timed run; compare the best strictly valid incumbent within the refinement horizon; retain invalid incumbents as diagnostics"
+  },
+  "execution": "serial, explicit confirmation, mains power required; no input generation",
+  "statistics": "three paired planner seeds, one shortcut seed each; not a 3x3 online experiment",
+  "notes": [
+    "Offline uses the exact vectorized group sampler from scalable_tree_group with its tree removed, not the older caching robot_subset_mode implementation.",
+    "Keep the completed base study immutable. Store follow-up results separately.",
+    "Online baseline calls the real upstream robot_mode_shortcut(run_choice='tree').",
+    "Online uses saved planner configuration and Gibbs sampler where applicable."
+  ]
+}

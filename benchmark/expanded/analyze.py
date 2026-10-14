@@ -27,6 +27,31 @@ from expanded_lib import (  # noqa: E402
 from plot_style import method_color  # noqa: E402
 
 
+SCALABLE_METHOD_ID = "scalable_tree_group"
+SCALABLE_METHOD = {
+    "id": SCALABLE_METHOD_ID,
+    "label": "scalable tree/group",
+    "policy": SCALABLE_METHOD_ID,
+}
+SCALABLE_RESULTS = HERE / "analysis" / "scalable-tree-group-final"
+
+
+def plot_methods(case):
+    selected = dict(methods_for(case))
+    if case["track"] in {"broad", "scaling"}:
+        selected[SCALABLE_METHOD_ID] = SCALABLE_METHOD
+    return selected
+
+
+def plot_result_path(case_id, method_id, path_index, seed):
+    if method_id == SCALABLE_METHOD_ID:
+        return (
+            SCALABLE_RESULTS / case_id
+            / f"{method_id}-path{path_index}-seed{seed}.json"
+        )
+    return result_path(case_id, method_id, path_index, seed)
+
+
 def step_values(times, costs, grid):
     indices = np.searchsorted(times, grid, side="right") - 1
     values = np.ones_like(grid)
@@ -36,7 +61,7 @@ def step_values(times, costs, grid):
 
 
 def run_curve(case_id, method_id, path_index, seed, grid):
-    result = read_json(result_path(case_id, method_id, path_index, seed))
+    result = read_json(plot_result_path(case_id, method_id, path_index, seed))
     trace = result["trace"]
     times = np.asarray([point["time"] for point in trace], dtype=float)
     costs = np.asarray([point["cost"] for point in trace], dtype=float)
@@ -53,7 +78,7 @@ def aggregate(case, method_id):
         seed_curves = [
             run_curve(case["id"], method_id, path_index, seed, grid)
             for seed in protocol()["shortcut_seeds"]
-            if result_path(case["id"], method_id, path_index, seed).is_file()
+            if plot_result_path(case["id"], method_id, path_index, seed).is_file()
         ]
         if not seed_curves:
             continue
@@ -89,20 +114,20 @@ def title(case):
 def check_complete(selected):
     missing = []
     for case in selected:
-        for method_id in methods_for(case):
+        for method_id in plot_methods(case):
             for path_index in case["path_indices"]:
                 for seed in protocol()["shortcut_seeds"]:
-                    path = result_path(case["id"], method_id, path_index, seed)
+                    path = plot_result_path(case["id"], method_id, path_index, seed)
                     if not path.is_file():
                         missing.append(str(path))
     return missing
 
 
-def plot_cases(selected, output, name, rows, columns):
+def plot_cases(selected, output, name, rows, columns, *, log_time=False):
     aggregates = {
         (case["id"], method_id): aggregate(case, method_id)
         for case in selected
-        for method_id in methods_for(case)
+        for method_id in plot_methods(case)
     }
     figure, axes = plt.subplots(
         rows,
@@ -111,7 +136,7 @@ def plot_cases(selected, output, name, rows, columns):
         squeeze=False,
     )
     for axis, case in zip(axes.flat, selected):
-        for method_id, method in methods_for(case).items():
+        for method_id, method in plot_methods(case).items():
             value = aggregates[(case["id"], method_id)]
             color = method_color(method_id)
             axis.plot(
@@ -131,6 +156,13 @@ def plot_cases(selected, output, name, rows, columns):
         axis.set_title(title(case), fontsize=19)
         axis.set_xlabel("time [s]", fontsize=17)
         axis.set_ylabel("normalized cost", fontsize=17)
+        if log_time:
+            axis.set_xscale("log")
+            first_positive = min(
+                aggregates[(case["id"], method_id)]["grid"][1]
+                for method_id in plot_methods(case)
+            )
+            axis.set_xlim(left=first_positive)
         axis.tick_params(labelsize=14)
         axis.grid(alpha=0.22)
     for axis in axes.flat[len(selected):]:
@@ -140,15 +172,18 @@ def plot_cases(selected, output, name, rows, columns):
     for axis in axes.flat[:len(selected)]:
         for handle, label in zip(*axis.get_legend_handles_labels()):
             handles.setdefault(label, handle)
+    legend_columns = min(len(handles), max(columns, 4))
+    legend_rows = math.ceil(len(handles) / legend_columns)
     figure.legend(
         handles.values(),
         handles.keys(),
         loc="lower center",
-        ncol=min(len(handles), columns),
+        ncol=legend_columns,
         fontsize=16,
         frameon=False,
     )
-    figure.tight_layout(rect=(0, 0.08, 1, 1))
+    bottom = 0.08 + 0.055 * (legend_rows - 1)
+    figure.tight_layout(rect=(0, bottom, 1, 1))
     destination = output / name
     figure.savefig(destination, dpi=180, bbox_inches="tight")
     plt.close(figure)
@@ -182,6 +217,14 @@ def main() -> int:
             rows=2,
             columns=5,
         ))
+        paths.append(plot_cases(
+            chunk,
+            output,
+            f"expanded-broad-curves-{page}-log.png",
+            rows=2,
+            columns=5,
+            log_time=True,
+        ))
     if broad:
         paths.append(plot_cases(
             broad,
@@ -189,6 +232,14 @@ def main() -> int:
             "expanded-broad-curves-combined.png",
             rows=6,
             columns=5,
+        ))
+        paths.append(plot_cases(
+            broad,
+            output,
+            "expanded-broad-curves-combined-log.png",
+            rows=6,
+            columns=5,
+            log_time=True,
         ))
     scaling = [case for case in selected if case["track"] == "scaling"]
     if scaling:

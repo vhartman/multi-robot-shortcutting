@@ -1,0 +1,157 @@
+{
+  "schema": "mr-shortcut-all-scaling-v1",
+  "status": "prepared-not-run",
+  "purpose": "Five-method offline comparison on every retained robot/task-count scaling experiment with one initial path and two shortcut seeds",
+  "execution": "strictly_serial",
+  "certificate_failure_policy": "record_failed_replicate_and_continue_without_retry",
+  "pythonhashseed": 0,
+  "path_indices": [0],
+  "shortcut_seeds": [0, 1],
+  "expected_case_counts": {
+    "isolated_box_stacking": 9,
+    "disk_scaling": 6,
+    "coupled_box_stacking": 5,
+    "mobile_wall_scaling": 49
+  },
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "methods": [
+    {
+      "id": "tree_gain",
+      "label": "tree + gain (standard)",
+      "policy": "tree_prefix"
+    },
+    {
+      "id": "full_tree_gain_round_robin",
+      "label": "full/tree/gain round robin",
+      "policy": "full_tree_gain_round_robin"
+    },
+    {
+      "id": "scalable_tree_group",
+      "label": "scalable tree + group",
+      "policy": "scalable_tree_group"
+    },
+    {
+      "id": "robot_subset_mode",
+      "label": "random robot subset + compatible run",
+      "policy": "robot_subset_mode"
+    },
+    {
+      "id": "full_configuration",
+      "label": "full configuration",
+      "policy": "full_configuration"
+    }
+  ],
+  "case_grids": [
+    {
+      "id_format": "rai-isolated-box-stacking-r{num_robots}-b4",
+      "axes": {"num_robots": [1, 2, 3, 4, 5, 6]},
+      "case": {
+        "family": "isolated_box_stacking",
+        "constructor": "rai_isolated_arm_box_stack_env",
+        "environment_kwargs": {"num_boxes": 4},
+        "environment_seed": 0,
+        "seconds": 30,
+        "input_root": "benchmark/expanded/inputs"
+      }
+    },
+    {
+      "id_format": "rai-isolated-box-stacking-r{num_robots}-b4",
+      "axes": {"num_robots": [7, 8, 9]},
+      "case": {
+        "family": "isolated_box_stacking",
+        "constructor": "rai_isolated_arm_box_stack_env",
+        "environment_kwargs": {"num_boxes": 4},
+        "environment_seed": 0,
+        "seconds": 30,
+        "input_root": "benchmark/scaling_mobile_wall/inputs"
+      }
+    },
+    {
+      "id_format": "rai-disk-scaling-r{num_robots}-g4",
+      "axes": {"num_robots": [2, 4, 6, 8, 10, 12]},
+      "case": {
+        "family": "disk_scaling",
+        "constructor": "rai_disk_scaling",
+        "environment_kwargs": {
+          "num_goals": 4,
+          "num_obstacles": 10,
+          "max_robots": 12
+        },
+        "environment_seed": 2,
+        "seconds": 15,
+        "input_root": "benchmark/scaling_2d/inputs"
+      }
+    },
+    {
+      "id_format": "rai-coupled-box-stacking-r{num_robots}-b8",
+      "axes": {"num_robots": [2, 3, 4, 5, 6]},
+      "case": {
+        "family": "coupled_box_stacking",
+        "constructor": "coupled_box_stacking_env",
+        "environment_kwargs": {"num_boxes": 8, "environment_seed": 10},
+        "environment_seed": 10,
+        "seconds": 30,
+        "input_root": "benchmark/scalable_study/inputs"
+      }
+    },
+    {
+      "id_format": "rai-mobile-wall-scaling-r{num_robots}-x{wall_x}-z{wall_z}",
+      "axes": {
+        "num_robots": [1, 2, 3, 4, 5, 6, 7],
+        "wall_shape": [
+          {"wall_x": 2, "wall_z": 2},
+          {"wall_x": 3, "wall_z": 2},
+          {"wall_x": 3, "wall_z": 3},
+          {"wall_x": 4, "wall_z": 3},
+          {"wall_x": 4, "wall_z": 4},
+          {"wall_x": 5, "wall_z": 4},
+          {"wall_x": 5, "wall_z": 5}
+        ]
+      },
+      "case": {
+        "family": "mobile_wall_scaling",
+        "constructor": "rai_mobile_wall_scaling_env",
+        "environment_seed": 3,
+        "seconds": 30,
+        "input_root": "benchmark/scaling_mobile_wall/inputs"
+      }
+    }
+  ],
+  "reuse_result_roots": [
+    "benchmark/all_scaling/offline/results",
+    "benchmark/scalable_study/offline/results",
+    "benchmark/expanded/offline/results",
+    "benchmark/scaling_2d/offline/results"
+  ],
+  "offline": {
+    "interpolation_resolution": 0.5,
+    "budget_type": "shortcut_wall_clock_seconds",
+    "timer_excludes": [
+      "environment construction",
+      "input restoration and certification",
+      "final certification"
+    ]
+  },
+  "aggregation": {
+    "within_path": "pointwise median over shortcut seeds",
+    "across_paths": "pointwise median over initial paths",
+    "uncertainty": "minimum to maximum across path medians",
+    "weighting": "each initial path has equal weight",
+    "normalization": "divide by each initial path cost"
+  },
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c",
+    "compatible_core_implementation_sha256": [
+      "f310f66721c9ee4ec8bd1e5a5e381e6d3fcc7d270037e9ad05fb913193a63c82",
+      "dc8fa2c26b64b40d7c0353793065330a5b466d5637ce573cb44fd3d7b25c3f7e"
+    ]
+  }
+}

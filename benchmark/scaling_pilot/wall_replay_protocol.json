@@ -1,0 +1,47 @@
+{
+  "schema": "mr-shortcut-scaling-wall-online-replay-v1",
+  "status": "frozen-additive-continuation",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "path_indices": [0],
+  "shortcut_seeds": [0, 1],
+  "methods": [
+    {"id": "full_configuration", "label": "full configuration", "policy": "full_configuration"},
+    {"id": "tree_gain", "label": "tree + gain", "policy": "tree_prefix"},
+    {"id": "tree_group_gain", "label": "tree + group gain", "policy": "tree_group_gain"},
+    {"id": "robot_subset_mode", "label": "robot subset + compatible run", "policy": "robot_subset_mode"},
+    {"id": "scalable_tree_group", "label": "tree + compatible group (interleaved)", "policy": "scalable_tree_group"},
+    {"id": "tree_then_compatible_group", "label": "tree + compatible group (sequenced)", "policy": "tree_then_compatible_group"}
+  ],
+  "case_ids": [
+    "rai-mobile-wall-scaling-r3-x5-z5",
+    "rai-mobile-wall-scaling-r4-x5-z5",
+    "rai-mobile-wall-scaling-r5-x5-z5",
+    "rai-mobile-wall-scaling-r6-x5-z5",
+    "rai-mobile-wall-scaling-r7-x5-z5"
+  ],
+  "offline": {
+    "interpolation_resolution": 0.5,
+    "seconds_by_family": {"mobile_wall_scaling": 30}
+  },
+  "online": {
+    "checks_per_call": 100,
+    "first_solution_cap_seconds": 240,
+    "refinement_seconds": 45,
+    "reference_method": "tree_gain",
+    "numpy_draws_after_seed": 5,
+    "reference_cost_check": "not compared with the separately generated offline input",
+    "pairing": "same planner seed/configuration and exact pre-shortcut first path across all online methods"
+  },
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01
+  },
+  "notes": [
+    "The original input generator seeded NumPy before importing mr-bench planner modules.",
+    "At the frozen revision those imports consume five NumPy draws; the continuation replays them explicitly.",
+    "The replay stream is used only to obtain a tractable online first solution; every candidate is compared exactly with its online reference.",
+    "This additive result root supersedes the failed/pending original-pilot cells for wall counts three through seven only."
+  ]
+}

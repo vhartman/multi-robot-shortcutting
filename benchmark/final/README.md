@@ -1,6 +1,10 @@
 # Final four-environment experiment
 
-This directory is the frozen final comparison used by the experiments section of the multi-robot shortcutting article. It intentionally covers the four plotted environments; the later broad offline winner evaluation is a separate experiment and is not fixed yet.
+This directory is the frozen four-environment comparison from the first post.
+The later broad and scaling studies have separate protocols; see the
+[benchmark index](../README.md). The lock is historical: do not regenerate it
+just to accept later implementation changes. Use the first-post revision
+specified in the root README when reproducing this exact protocol.
 
 ## Design
 

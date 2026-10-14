@@ -314,6 +314,7 @@ class _TreePrefixProposer:
         full_singleton_tree_prefix=False,
         skip_tree_prefix=False,
         tree_only=False,
+        singleton_gain_evaluator=None,
         zero_accept_subset=False,
         random_run_fallback=False,
         random_subset_fallback=False,
@@ -331,6 +332,11 @@ class _TreePrefixProposer:
         self.full_singleton_tree_prefix = bool(full_singleton_tree_prefix)
         self.skip_tree_prefix = bool(skip_tree_prefix)
         self.tree_only = bool(tree_only)
+        self.singleton_gain_evaluator = (
+            _full_run_gain
+            if singleton_gain_evaluator is None
+            else singleton_gain_evaluator
+        )
         self.zero_accept_subset = bool(zero_accept_subset)
         self.random_run_fallback = bool(random_run_fallback)
         self.random_subset_fallback = bool(random_subset_fallback)
@@ -447,7 +453,12 @@ class _TreePrefixProposer:
         self.fallback = "gain"
         self.gains = [
             [
-                max(0.0, _full_run_gain(self.env, self.path, robot, first, last))
+                max(
+                    0.0,
+                    self.singleton_gain_evaluator(
+                        self.env, self.path, robot, first, last
+                    ),
+                )
                 for first, last in robot_runs
             ]
             for robot, robot_runs in enumerate(self.runs)
@@ -743,9 +754,9 @@ class _TreePrefixProposer:
                 if first < proposal.last and proposal.first < last:
                     self.gains[other_robot][other_run] = max(
                         0.0,
-                        _full_run_gain(
-                            self.env, self.path, other_robot, first, last
-                        ),
+                            self.singleton_gain_evaluator(
+                                self.env, self.path, other_robot, first, last
+                            ),
                     )
 
 
@@ -1314,7 +1325,10 @@ def _attempt_once(env, path, propose, stats, current_cost, lineage=None):
         path_cost(path[proposal.first : proposal.last + 1], env.batch_config_cost)
     )
     candidate_cost = float(path_cost(candidate, env.batch_config_cost))
-    if candidate_cost >= old_cost:
+    minimum_improvement = float(
+        getattr(propose, "minimum_cost_improvement", 0.0)
+    )
+    if old_cost - candidate_cost <= minimum_improvement:
         if hasattr(propose, "feedback"):
             propose.feedback(
                 "cost",

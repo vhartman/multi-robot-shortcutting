@@ -1,0 +1,107 @@
+{
+  "schema": "mr-shortcut-mobile-wall-scaling-v1",
+  "status": "prepared-not-run",
+  "purpose": "Offline shortcutting on the WAFR mobile-wall grid and the 7--9 robot extension of isolated box stacking",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "shortcut_seeds": [0, 1, 2],
+  "expected_case_count": 52,
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "methods": [
+    {
+      "id": "tree_gain",
+      "label": "tree + gain (standard)",
+      "policy": "tree_prefix",
+      "tracks": ["scaling"]
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain (previous best)",
+      "policy": "tree_group_gain",
+      "tracks": ["scaling"]
+    },
+    {
+      "id": "scalable_tree_group",
+      "label": "scalable tree + group",
+      "policy": "scalable_tree_group",
+      "tracks": ["scaling"]
+    }
+  ],
+  "policy_modules": ["scaling_2d.scalable_tree_group"],
+  "cases": [],
+  "case_grids": [
+    {
+      "id_format": "rai-mobile-wall-scaling-r{num_robots}-x{wall_x}-z{wall_z}",
+      "axes": {
+        "num_robots": [1, 2, 3, 4, 5, 6, 7],
+        "wall_shape": [
+          {"wall_x": 2, "wall_z": 2},
+          {"wall_x": 3, "wall_z": 2},
+          {"wall_x": 3, "wall_z": 3},
+          {"wall_x": 4, "wall_z": 3},
+          {"wall_x": 4, "wall_z": 4},
+          {"wall_x": 5, "wall_z": 4},
+          {"wall_x": 5, "wall_z": 5}
+        ]
+      },
+      "case": {
+        "track": "scaling",
+        "kind": "mrbench",
+        "constructor": "rai_mobile_wall_scaling_env",
+        "environment_seed": 3,
+        "pythonhashseed": 0,
+        "seconds": 30,
+        "path_indices": [0, 1, 2],
+        "input": "generate",
+        "input_generation_seconds": 600
+      }
+    },
+    {
+      "id_format": "rai-isolated-box-stacking-r{num_robots}-b4",
+      "axes": {
+        "num_robots": [7, 8, 9]
+      },
+      "case": {
+        "track": "scaling",
+        "kind": "mrbench",
+        "constructor": "rai_isolated_arm_box_stack_env",
+        "environment_kwargs": {"num_boxes": 4},
+        "environment_seed": 0,
+        "pythonhashseed": 0,
+        "seconds": 30,
+        "path_indices": [0, 1, 2],
+        "input": "generate",
+        "input_generation_seconds": 1800
+      }
+    }
+  ],
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c"
+  },
+  "aggregation": {
+    "within_path": "pointwise median over shortcut seeds",
+    "across_paths": "pointwise median over initial paths",
+    "uncertainty": "minimum to maximum across path medians",
+    "weighting": "each initial path has equal weight",
+    "normalization": "divide by each initial path cost"
+  },
+  "retained_diagnostics": [
+    "accepted cost-time trace",
+    "collision checks at every accepted improvement",
+    "draw, compatibility, cost-gate, collision-check, and acceptance counts",
+    "valid and invalid collision-check time",
+    "accepted shortcut endpoint, robot-group, gain, check-time, and surviving-lineage data"
+  ],
+  "source_hashes": {
+    "benchmark/scaling_mobile_wall/environment.py": "aeff98c2b5c3ceb773f20202c3d271819173a041b4324c3e195ae15fb0328054",
+    "benchmark/scaling_2d/scalable_tree_group.py": "66465819a3f876c9d16905a57b8c52f9ef38bdd2b39e144cd0d73c855fa5e60c"
+  }
+}

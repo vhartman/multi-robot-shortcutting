@@ -42,4 +42,15 @@ python benchmark/expanded/analyze.py
 python benchmark/expanded/analyze_metrics.py
 ```
 
+Run the scalable tree/group follow-up on both expanded tracks:
+
+```bash
+python benchmark/expanded/run_scalable_group_trials.py \
+  --track broad --track scaling --policy scalable_tree_group \
+  --mr-bench-repo /path/to/mr_bench \
+  --assembly-repo /path/to/assembly \
+  --output-root benchmark/expanded/analysis/scalable-tree-group-final
+python benchmark/expanded/analyze_scalable_tree_group_final.py
+```
+
 The runner is resumable and refuses stale or invalid cells. Use `--case`, `--track`, `--method`, `--path-index`, or `--shortcut-seed` to run a subset. `analyze_metrics.py` writes reusable run-level and scenario-level CSV files alongside the figures. Generated inputs, logs, result JSON, audit records, and plots are ignored by Git.

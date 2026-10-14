@@ -36,7 +36,7 @@ from expanded_lib import (  # noqa: E402
     sha256,
     write_json,
 )
-from mr_shortcutting import run  # noqa: E402
+from mr_shortcutting import load_shortcutter_plugins, run  # noqa: E402
 
 
 def main() -> int:
@@ -51,6 +51,7 @@ def main() -> int:
     args = parser.parse_args()
 
     data = protocol()
+    load_shortcutter_plugins(data.get("policy_modules", []))
     case = cases()[args.case]
     method_map = methods_for(case)
     if args.method not in method_map:

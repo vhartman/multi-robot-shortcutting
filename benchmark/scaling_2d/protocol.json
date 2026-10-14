@@ -1,0 +1,228 @@
+{
+  "schema": "mr-shortcut-expanded-offline-v1",
+  "status": "pilot",
+  "purpose": "Fixed-workspace 2D disk scaling with ten obstacles and four goals per robot",
+  "execution": "strictly_serial",
+  "pythonhashseed": 0,
+  "shortcut_seeds": [
+    0,
+    1,
+    2
+  ],
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_metric": "euclidean",
+    "implementation_reduction": "max",
+    "regularization_weight": 0.01,
+    "edge_formula": "max_r ||q_(i+1)^r-q_i^r||_2 + 0.01 sum_r ||q_(i+1)^r-q_i^r||_2",
+    "path_reduction": "sum_over_edges"
+  },
+  "methods": [
+    {
+      "id": "single_robot_mode",
+      "label": "random robot + compatible run",
+      "policy": "single_robot_mode",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "tree_gain",
+      "label": "tree + gain",
+      "policy": "tree_prefix",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "tree_group_gain",
+      "label": "tree + group gain",
+      "policy": "tree_group_gain",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "full_tree_gain_round_robin",
+      "label": "full/tree/gain round robin",
+      "policy": "full_tree_gain_round_robin",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "full_configuration",
+      "label": "full configuration",
+      "policy": "full_configuration",
+      "tracks": [
+        "scaling"
+      ]
+    },
+    {
+      "id": "robot_subset_mode",
+      "label": "random robot subset + compatible run",
+      "policy": "robot_subset_mode",
+      "tracks": [
+        "scaling"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "rai-disk-scaling-r2-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 2,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 180
+    },
+    {
+      "id": "rai-disk-scaling-r4-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 4,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 180
+    },
+    {
+      "id": "rai-disk-scaling-r6-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 6,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 180
+    },
+    {
+      "id": "rai-disk-scaling-r8-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 8,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 180
+    },
+    {
+      "id": "rai-disk-scaling-r10-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 10,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 900,
+      "input_sampler": "gibbs_random_scan",
+      "input_stepsize": 0.25,
+      "input_home_bias": 1.0
+    },
+    {
+      "id": "rai-disk-scaling-r12-g4",
+      "track": "scaling",
+      "kind": "mrbench",
+      "constructor": "rai_disk_scaling",
+      "environment_kwargs": {
+        "num_robots": 12,
+        "num_goals": 4,
+        "num_obstacles": 10,
+        "max_robots": 12
+      },
+      "environment_seed": 2,
+      "pythonhashseed": 0,
+      "seconds": 15,
+      "path_indices": [
+        0,
+        1,
+        2
+      ],
+      "input": "generate",
+      "input_generation_seconds": 180
+    }
+  ],
+  "software": {
+    "python": "3.10.12",
+    "mr_bench_revision": "3142dacfbfc22d619f52d69d07164eacae21b26c"
+  },
+  "aggregation": {
+    "within_path": "pointwise_median_over_shortcut_seeds",
+    "across_paths": "pointwise_median_over_initial_paths",
+    "uncertainty_multiple_paths": "minimum_to_maximum_across_path_medians",
+    "uncertainty_single_path": "minimum_to_maximum_over_shortcut_seeds",
+    "normalization": "divide_by_each_initial_path_cost"
+  },
+  "retained_diagnostics": [
+    "accepted cost-time trace",
+    "collision checks at every accepted improvement",
+    "draw, compatibility, cost-gate, collision-check, and acceptance counts",
+    "valid and invalid collision-check time",
+    "accepted shortcut endpoint, robot-subset, gain, check-time, and surviving-lineage data"
+  ],
+  "source_hashes": {
+    "benchmark/scaling_2d/environment.py": "d6a7d864c244cef58eb85035172a19d08248cac5191e544706ac043bab0c5791"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "mr-shortcut-scaling-sum-cost-replication-v1",
+  "execution": "strictly_serial",
+  "path_indices": [0, 1, 2],
+  "shortcut_seeds": [0, 1],
+  "case_ids": [
+    "rai-disk-scaling-r12-g4",
+    "rai-isolated-box-stacking-r9-b4",
+    "rai-coupled-box-stacking-r6-b8",
+    "rai-mobile-wall-scaling-r7-x5-z5"
+  ],
+  "methods_from": "protocol.json",
+  "cost": {
+    "per_robot_metric": "euclidean",
+    "implementation_reduction": "sum",
+    "path_reduction": "sum_over_edges"
+  },
+  "notes": [
+    "Reuse certified matching original path0/seed0 cells; run only missing cells.",
+    "Use the same initial paths and budgets as the max-cost scaling comparison.",
+    "Aggregate seed medians within each path, then median across paths; bands span path medians."
+  ]
+}

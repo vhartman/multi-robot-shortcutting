@@ -8,10 +8,11 @@ import os
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from expanded_lib import (
+    ARTIFACT_ROOT,
     HERE,
     REPO,
     cases,
@@ -35,7 +36,7 @@ from expanded_lib import (
 
 CELL_RUNNER = HERE / "run_offline_cell.py"
 INPUT_GENERATOR = HERE / "generate_input.py"
-AUDIT_PATH = HERE / "execution-audit.jsonl"
+AUDIT_PATH = ARTIFACT_ROOT / "execution-audit.jsonl"
 
 
 @dataclass(frozen=True)
@@ -190,6 +191,10 @@ def artifact_errors(cell: Cell) -> list[str]:
 
 def checkout_errors(selected, mr_bench: Path, assembly: Path | None):
     errors = validate_protocol()
+    for relative_path, expected_digest in protocol().get("source_hashes", {}).items():
+        source_path = REPO / relative_path
+        if not source_path.is_file() or sha256(source_path) != expected_digest:
+            errors.append(f"benchmark source differs from protocol: {relative_path}")
     actual_python = ".".join(str(value) for value in sys.version_info[:3])
     if actual_python != protocol()["software"]["python"]:
         errors.append(
@@ -287,6 +292,10 @@ def main() -> int:
     parser.add_argument("--assembly-repo", type=Path)
     parser.add_argument("--confirm", action="store_true")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--input-seconds", type=float)
+    parser.add_argument("--input-stepsize", type=float)
+    parser.add_argument("--input-home-bias", type=float)
+    parser.add_argument("--input-sampler", choices=("auto", "joint", "per_robot", "gibbs", "gibbs_random_scan"))
     args = parser.parse_args()
 
     selected = selected_cases(args.case, args.track)
@@ -299,6 +308,8 @@ def main() -> int:
     )
     errors = checkout_errors(selected, mr_bench, assembly)
     generated = input_cells(selected, args.path_index)
+    if args.input_seconds is not None:
+        generated = [replace(cell, seconds=max(cell.seconds, args.input_seconds)) for cell in generated]
     offline = offline_cells(
         selected,
         args.method,
@@ -363,6 +374,17 @@ def main() -> int:
                 )
                 continue
             case = cases()[cell.case_id]
+            sampler = args.input_sampler or case.get("input_sampler", "auto")
+            stepsize = (
+                args.input_stepsize
+                if args.input_stepsize is not None
+                else float(case.get("input_stepsize", 1.0))
+            )
+            home_bias = (
+                args.input_home_bias
+                if args.input_home_bias is not None
+                else float(case.get("input_home_bias", 0.0))
+            )
             cell.output.parent.mkdir(parents=True, exist_ok=True)
             cell.log.parent.mkdir(parents=True, exist_ok=True)
             command = [
@@ -371,6 +393,9 @@ def main() -> int:
                 "--case", cell.case_id,
                 "--path-index", str(cell.path_index),
                 "--seconds", str(cell.seconds),
+                "--stepsize", str(stepsize),
+                "--home-bias", str(home_bias),
+                "--sampler", sampler,
                 "--mr-bench-repo", str(mr_bench),
                 "--output", str(cell.output),
             ]

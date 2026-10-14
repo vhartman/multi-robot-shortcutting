@@ -1,44 +1,90 @@
 # Multi-robot shortcutting
 
-Reusable shortcutting policies and the frozen benchmark protocol for the multi-robot shortcutting study. The repository follows a small `src/` package plus a separate benchmark runner: implementation code is importable, while protocols and generated data remain separate.
+Shortcut proposal policies, a shared validation/execution engine, and the
+protocols behind [Multi-robot shortcutting](https://vhartmann.com/multi-robot-shortcutting/)
+and [Scaling shortcutting to many robots](https://vhartmann.com/scalable-multi-robot-shortcutting/).
+
+The package is independent of the benchmark runners: use an existing planning
+environment and path, or implement a new proposal policy without duplicating
+collision checking, interpolation, cost gating, or logging.
 
 ## Install
 
-The final protocol requires Python 3.10 and the exact `mr_bench` revision recorded in [`protocol.json`](benchmark/final/protocol.json). Once that revision is published, a normal editable install is enough:
+Use Python 3.10 (the experiments used 3.10.12). From this repository:
+
+**Release prerequisite:** the pinned planner commit below is not currently
+fetchable from the public remote. Until that exact source is published, use
+the local-checkout installation below. The normal installation command will
+not work on a clean machine yet; do not substitute another planner revision
+when reproducing the published protocol.
 
 ```bash
 python3.10 -m venv .venv
-.venv/bin/pip install -e .
+.venv/bin/python -m pip install -e .
+source .venv/bin/activate
 ```
 
-Until then, install a local checkout at revision `3142dacfbfc22d619f52d69d07164eacae21b26c` first, then install this package without resolving its remote dependency again:
+The package pins the planner dependency to
+`3142dacfbfc22d619f52d69d07164eacae21b26c`. If working with a local planner
+checkout, install that revision with its dependencies first, then install this
+package without resolving the remote dependency again:
 
 ```bash
-.venv/bin/pip install -e /path/to/mr_bench
-.venv/bin/pip install -e . --no-deps
+.venv/bin/python -m pip install -e /path/to/mr_bench
+.venv/bin/python -m pip install -e . --no-deps
 ```
 
-Assembly cases also need an assembly checkout. No machine-specific checkout path is embedded in the code; pass both checkout locations to the runner or set `MR_BENCH_REPO` and `ASSEMBLY_REPO`.
+Assembly scenarios additionally require the assembly checkout specified by the
+study. Supply checkout locations through the runner's `--mr-bench-repo` and
+`--assembly-repo` arguments. The first-post runner also accepts
+`MR_BENCH_REPO` and `ASSEMBLY_REPO`. Serial runners use Linux power/suspend
+monitoring and file locks; keep a laptop plugged in for timing experiments.
 
 ## Use a shortcutter
 
 ```python
-from mr_shortcutting import run, run_checks
+from mr_shortcutting import load_shortcutter_plugins, run, run_checks
 
-path, report = run(env, path, "tree_group_gain", seconds=30, seed=0)
+# Register the scalable policies from the second post.
+load_shortcutter_plugins(["mr_shortcutting.scalable"])
+
+path, report = run(env, path, "scalable_tree_group", seconds=30, seed=0)
 path, report = run_checks(
-    env, path, "tree_group_gain", max_collision_checks=250, seed=0
+    env, path, "scalable_tree_group", max_collision_checks=250, seed=0
 )
 ```
 
-`run` is the offline wall-clock interface. `run_checks` uses a collision-check budget and is the interface used inside the planner. Both return the updated path and a trace/report dictionary.
+`env` and `path` use the planner package's environment and `State` interfaces.
+`run` is the offline wall-clock interface; `run_checks` uses a collision-check
+budget for planner integration. Each call creates fresh policy state and returns
+the updated path plus a trace/report dictionary. Query
+`available_shortcutters()` after loading plugins for all registered policy IDs;
+`POLICIES` lists only the original built-ins.
+
+| Name in the scaling post | Policy ID |
+|---|---|
+| full configuration | `full_configuration` |
+| tree + gain | `tree_prefix` (benchmark alias: `tree_gain`) |
+| tree + group gain | `tree_group_gain` |
+| compatible subset, scaling comparison | `robot_subset_mode` |
+| compatible subset, broad vectorized ablation | `random_compatible_group` |
+| tree + compatible (interleaved) | `scalable_tree_group` |
+| tree + compatible (sequenced) | `tree_then_compatible_group` |
+
+The last three IDs are registered by `mr_shortcutting.scalable`. The two
+compatible-subset implementations have the same sampling idea but different
+bookkeeping: the broad ablation uses the vectorized sampler and the scalable
+methods' `1e-6` minimum cost improvement. They are not interchangeable run IDs.
+“Tree + gain” here is the benchmark policy, not a promise about what a newer
+upstream planner uses by default.
 
 ## Add a shortcutter
 
-A new method only supplies proposals. The common engine keeps interpolation, cost gating, collision checks, budgets, accepted-path updates, traces, and certificates identical across methods.
+Implement the abstract `Shortcutter` factory, returning a callable proposal
+source. Return `None` to skip a draw. A compatible interval must have no mode
+change for any selected robot, including its interior states.
 
 ```python
-import numpy as np
 from mr_shortcutting import Proposal, Shortcutter, register_shortcutter
 
 class MyShortcutter(Shortcutter):
@@ -47,50 +93,76 @@ class MyShortcutter(Shortcutter):
     def make_proposer(self, env, path, rng, interpolation_resolution):
         def propose():
             robot = int(rng.integers(len(env.robots)))
-            first, last = sorted(rng.integers(len(path), size=2))
+            first, last = sorted(map(int, rng.integers(len(path), size=2)))
             if last - first < 2:
                 return None
-            if path[first].mode.task_ids[robot] != path[last].mode.task_ids[robot]:
+            task = path[first].mode.task_ids[robot]
+            if any(s.mode.task_ids[robot] != task for s in path[first:last + 1]):
                 return None
-            return Proposal(int(first), int(last), (robot,))
+            return Proposal(first, last, (robot,))
         return propose
 
 register_shortcutter(MyShortcutter())
 ```
 
-Proposal sources may expose `feedback(...)`, `consider_time(...)`, or a `stats` mapping when a policy needs observations from the shared engine. External modules can be loaded explicitly with `load_shortcutter_plugins(["my_package.shortcutters"])`.
+The engine changes the bound path in place as it accepts shortcuts. A proposer
+can inspect that updated path on subsequent calls. Optional hooks are
+`feedback(outcome, proposal, **details)`, `consider_time(elapsed, current_cost)`,
+and a `stats` mapping. External plugin modules register their policies on import
+and can be loaded with `load_shortcutter_plugins(["my_package.shortcutters"])`.
+Use the same shared engine and validation settings for comparisons.
 
-## Reproduce the final benchmark
+## Reproduce the studies
 
-Nothing executes without `execute --confirm`. Start with the matrix and preflight checks:
+Start at the [benchmark index](benchmark/README.md). The main entry points are:
+
+- [Scaling, online, and alternative-cost comparisons](benchmark/scaling_pilot/README.md):
+  27 scaling cases, six methods, 3 paths × 2 seeds offline; online remains 1 × 2.
+- [Broad comparison](benchmark/scalable_study/README.md):
+  27 retained broad cases, four methods, 3 paths × 3 seeds.
+- [First-post four-environment comparison](benchmark/final/README.md):
+  the historical 3 × 3 protocol.
+
+For the current scaling study, inspection does not start experiments:
 
 ```bash
-python benchmark/final/run.py plan
-python benchmark/final/run.py preflight \
-  --mr-bench-repo /path/to/mr_bench \
-  --assembly-repo /path/to/assembly
+python benchmark/scaling_pilot/prepare_inputs.py plan --mr-bench-repo /path/to/mr_bench
+python benchmark/scaling_pilot/run.py plan --track offline --mr-bench-repo /path/to/mr_bench
 ```
 
-Adopt the completed prior-work 3×3 cells, then run the two missing phases serially:
+Generated paths, results, logs, videos, and plots are not committed. A fresh
+checkout therefore needs input generation before shortcutting, and result
+generation before analysis. Regenerated paths are new samples, not a guarantee
+of reproducing the exact published trajectories or wall-clock curves.
+The study README describes certified-result reuse and the published
+successful-run aggregation, including three rejected cells.
 
-```bash
-python benchmark/final/adopt_prior_work.py \
-  --source /path/to/prior-work-multipath --write
-python benchmark/final/run.py execute --phase offline --pending-only --confirm \
-  --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
-python benchmark/final/run.py execute --phase online --pending-only --confirm \
-  --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
-python benchmark/final/validate.py \
-  --mr-bench-repo /path/to/mr_bench --assembly-repo /path/to/assembly
-python benchmark/final/analyze.py
-```
+### Historical source locks
 
-See [`benchmark/final/README.md`](benchmark/final/README.md) for the frozen design, aggregation rules, resume behavior, and expected matrix size. Generated inputs, results, logs, and plots are intentionally ignored by Git.
+The first-post content lock matches benchmark revision `7aef53d`. Use a
+separate checkout of that revision for an exact first-post protocol run;
+later shared-engine and plot-style changes intentionally do not satisfy its
+old lock. Do not re-lock old data to make a validation warning disappear.
 
-## Layout
+The scaling runners retain their original implementation module at
+`benchmark/scaling_2d/scalable_tree_group.py` because manifests hash its bytes.
+The installed plugin is a behavior-equivalent copy, verified by
+`python scripts/check_release.py`. Published workers still use the frozen
+module. No existing result needs to be rewritten to use the installed package.
 
-- `src/mr_shortcutting/`: public API, registry, maintained policies, and shared execution engine.
-- `benchmark/manifest.json`: the 15 frozen scenarios and deterministic environment seeds.
-- `benchmark/fixtures/assembly/`: source plans/exports required to reconstruct the two assembly tasks.
-- `benchmark/online.py`: planner-in-the-loop adapter.
-- `benchmark/final/`: frozen protocol, serial runner, validation, lock, and analysis.
+## Repository layout
+
+- `src/mr_shortcutting/`: public extension API, shared engine, and policies.
+- `benchmark/scaling_pilot/`: final second-post scaling/online/sum-cost protocol.
+- `benchmark/scalable_study/`: broad study and compatible-group ablation.
+- `benchmark/scaling_2d/`, `scaling_coupled/`, `scaling_mobile_wall/`: scenes,
+  renderers, and historical source protocols.
+- `benchmark/final/`, `broad/`, `expanded/`, `all_scaling/`: earlier protocols
+  and source definitions retained for provenance and certified reuse.
+- `benchmark/fixtures/assembly/`: source fixtures, not benchmark results.
+- `benchmark/online_scheduling/`: unpublished planner exploration, explicitly
+  separate from the published experiments.
+- `scripts/check_release.py`: source/package smoke checks; no timed experiment.
+
+See the benchmark index before launching an older trial script: several
+historical protocols cover larger grids than the final published comparison.

@@ -25,6 +25,9 @@ METHOD_COLORS = {
     "tree_group_gain": "#d73027",
     "gain_only": "#7570b3",
     "full_tree_gain_round_robin": "#008695",
+    "scalable_tree_group": "#332288",
+    "tree_then_compatible_group": "#cc6677",
+    "random_compatible_group": "#1f78b4",
 }
 
 ALGORITHM_LINESTYLE = "-"
